@@ -27,3 +27,5 @@ if(MSVC)
 else()
     install(TARGETS jtag_analyzer LIBRARY DESTINATION ".")
 endif()
+
+set_post_build_destination(jtag_analyzer)
