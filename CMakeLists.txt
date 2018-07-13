@@ -19,13 +19,4 @@ src/JtagTypes.cpp
 src/JtagTypes.h
 )
 
-add_library(jtag_analyzer SHARED ${SOURCES})
-target_link_libraries(jtag_analyzer PRIVATE Saleae::AnalyzerSDK)
-
-if(MSVC)
-    install(TARGETS jtag_analyzer RUNTIME DESTINATION "Analyzers")
-else()
-    install(TARGETS jtag_analyzer LIBRARY DESTINATION "Analyzers")
-endif()
-
-set_post_build_destination(jtag_analyzer)
+add_analyzer_plugin(jtag_analyzer SOURCES ${SOURCES})
