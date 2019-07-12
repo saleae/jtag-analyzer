@@ -51,7 +51,8 @@ JtagAnalyzerSettings::JtagAnalyzerSettings()
 	mDataRegBitOrderInterface.AddNumber(LSB_First, "Least significant bit first", "Data register shift LEAST significant bit first");
 	mDataRegBitOrderInterface.SetNumber(mDataRegBitOrder);
 
-	mShowBitCountInterface.SetTitleAndTooltip( "Show TDI/TDO bit counts", "Used to count bits sent during Shift state" );
+	mShowBitCountInterface.SetTitleAndTooltip( "", "Used to count bits sent during Shift state" );
+	mShowBitCountInterface.SetCheckBoxText( "Show TDI/TDO bit counts" );
 	mShowBitCountInterface.SetValue( mShowBitCount );
 
 	// add the interfaces
