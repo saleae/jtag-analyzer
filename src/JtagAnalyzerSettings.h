@@ -8,48 +8,48 @@
 
 enum BitOrder
 {
-	MSB_First,
-	LSB_First,
+    MSB_First,
+    LSB_First,
 };
 
 class JtagAnalyzerSettings : public AnalyzerSettings
 {
-public:
-	JtagAnalyzerSettings();
-	virtual ~JtagAnalyzerSettings();
+  public:
+    JtagAnalyzerSettings();
+    virtual ~JtagAnalyzerSettings();
 
-	virtual bool SetSettingsFromInterfaces();
-	virtual void LoadSettings(const char* settings);
-	virtual const char* SaveSettings();
+    virtual bool SetSettingsFromInterfaces();
+    virtual void LoadSettings( const char* settings );
+    virtual const char* SaveSettings();
 
-	void UpdateInterfacesFromSettings();
+    void UpdateInterfacesFromSettings();
 
-	Channel		mTmsChannel;
-	Channel		mTckChannel;
-	Channel		mTdiChannel;
-	Channel		mTdoChannel;
-	Channel		mTrstChannel;
+    Channel mTmsChannel;
+    Channel mTckChannel;
+    Channel mTdiChannel;
+    Channel mTdoChannel;
+    Channel mTrstChannel;
 
-	JtagTAPState	mTAPInitialState;
+    JtagTAPState mTAPInitialState;
 
-	BitOrder		mInstructRegBitOrder;
-	BitOrder		mDataRegBitOrder;
+    BitOrder mInstructRegBitOrder;
+    BitOrder mDataRegBitOrder;
 
-	bool			mShowBitCount;
+    bool mShowBitCount;
 
-protected:
-	AnalyzerSettingInterfaceChannel		mTmsChannelInterface;
-	AnalyzerSettingInterfaceChannel		mTckChannelInterface;
-	AnalyzerSettingInterfaceChannel		mTdiChannelInterface;
-	AnalyzerSettingInterfaceChannel		mTdoChannelInterface;
-	AnalyzerSettingInterfaceChannel		mTrstChannelInterface;
+  protected:
+    AnalyzerSettingInterfaceChannel mTmsChannelInterface;
+    AnalyzerSettingInterfaceChannel mTckChannelInterface;
+    AnalyzerSettingInterfaceChannel mTdiChannelInterface;
+    AnalyzerSettingInterfaceChannel mTdoChannelInterface;
+    AnalyzerSettingInterfaceChannel mTrstChannelInterface;
 
-	AnalyzerSettingInterfaceNumberList	mTAPInitialStateInterface;
+    AnalyzerSettingInterfaceNumberList mTAPInitialStateInterface;
 
-	AnalyzerSettingInterfaceNumberList	mInstructRegBitOrderInterface;
-	AnalyzerSettingInterfaceNumberList	mDataRegBitOrderInterface;
+    AnalyzerSettingInterfaceNumberList mInstructRegBitOrderInterface;
+    AnalyzerSettingInterfaceNumberList mDataRegBitOrderInterface;
 
-	AnalyzerSettingInterfaceBool		mShowBitCountInterface;
+    AnalyzerSettingInterfaceBool mShowBitCountInterface;
 };
 
-#endif	// JTAG_ANALYZER_SETTINGS_H
+#endif // JTAG_ANALYZER_SETTINGS_H

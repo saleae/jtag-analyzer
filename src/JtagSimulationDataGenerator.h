@@ -7,32 +7,34 @@ class JtagAnalyzerSettings;
 
 class JtagSimulationDataGenerator
 {
-public:
-	JtagSimulationDataGenerator();
-	~JtagSimulationDataGenerator();
+  public:
+    JtagSimulationDataGenerator();
+    ~JtagSimulationDataGenerator();
 
-	void Initialize(U32 simulation_sample_rate, JtagAnalyzerSettings* settings);
-	U32 GenerateSimulationData( U64 newest_sample_requested, U32 sample_rate, SimulationChannelDescriptor** simulation_channels );
+    void Initialize( U32 simulation_sample_rate, JtagAnalyzerSettings* settings );
+    U32 GenerateSimulationData( U64 newest_sample_requested, U32 sample_rate, SimulationChannelDescriptor** simulation_channels );
 
-protected:
-	JtagAnalyzerSettings*	mSettings;
-	U32						mSimulationSampleRateHz;
+  protected:
+    JtagAnalyzerSettings* mSettings;
+    U32 mSimulationSampleRateHz;
 
-	enum { SPACE_TCK = 12 };
+    enum
+    {
+        SPACE_TCK = 12
+    };
 
-protected:
+  protected:
+    ClockGenerator mClockGenerator;
 
-	ClockGenerator mClockGenerator;
+    void CreateJtagTransaction();
 
-	void CreateJtagTransaction();
+    SimulationChannelDescriptorGroup mJtagSimulationChannels;
 
-	SimulationChannelDescriptorGroup	mJtagSimulationChannels;
-
-	SimulationChannelDescriptor*	mTms;
-	SimulationChannelDescriptor*	mTck;
-	SimulationChannelDescriptor*	mTdi;
-	SimulationChannelDescriptor*	mTdo;
-	SimulationChannelDescriptor*	mTrst;
+    SimulationChannelDescriptor* mTms;
+    SimulationChannelDescriptor* mTck;
+    SimulationChannelDescriptor* mTdi;
+    SimulationChannelDescriptor* mTdo;
+    SimulationChannelDescriptor* mTrst;
 };
 
-#endif	// JTAG_SIMULTAION_DATA_GENERATOR_H
+#endif // JTAG_SIMULTAION_DATA_GENERATOR_H
