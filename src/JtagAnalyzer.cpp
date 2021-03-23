@@ -194,9 +194,9 @@ void JtagAnalyzer::SetupResults()
 
     // set which channels will carry bubbles
     mResults->AddChannelBubblesWillAppearOn( mSettings.mTmsChannel );
-    if( mTdi != NULL )
+    if( mSettings.mTdiChannel != UNDEFINED_CHANNEL )
         mResults->AddChannelBubblesWillAppearOn( mSettings.mTdiChannel );
-    if( mTdo != NULL )
+    if( mSettings.mTdoChannel != UNDEFINED_CHANNEL )
         mResults->AddChannelBubblesWillAppearOn( mSettings.mTdoChannel );
 }
 
