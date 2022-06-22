@@ -130,6 +130,8 @@ void JtagAnalyzer::WorkerThread()
 
     for( ;; )
     {
+        bool alreadyClosedFrame = false;
+
         // advance TCK to the rising edge
         AdvanceTck( frm, shifted_data );
         if( mTck->GetBitState() == BIT_LOW )
@@ -144,12 +146,15 @@ void JtagAnalyzer::WorkerThread()
         // save TDI and TDO states markers and data
         if( mTAPCtrl.GetCurrState() == ShiftIR || mTAPCtrl.GetCurrState() == ShiftDR )
         {
+            size_t bitCount = 0;
+
             if( mTdi != NULL )
             {
                 mResults->AddMarker( mTdi->GetSampleNumber(),
                                      ( mTdi->GetBitState() == BIT_HIGH ? AnalyzerResults::One : AnalyzerResults::Zero ),
                                      mSettings.mTdiChannel );
                 shifted_data.mTdiBits.push_back( mTdi->GetBitState() );
+                bitCount = shifted_data.mTdiBits.size();
             }
 
             if( mTdo != NULL )
@@ -158,6 +163,21 @@ void JtagAnalyzer::WorkerThread()
                                      ( mTdo->GetBitState() == BIT_HIGH ? AnalyzerResults::One : AnalyzerResults::Zero ),
                                      mSettings.mTdoChannel );
                 shifted_data.mTdoBits.push_back( mTdo->GetBitState() );
+                bitCount = shifted_data.mTdoBits.size();
+            }
+
+            if( ( mSettings.mShiftDRBitsPerDataUnit != 0 ) && ( bitCount >= mSettings.mShiftDRBitsPerDataUnit ) )
+            {
+                alreadyClosedFrame = true;
+                CloseFrame( frm, shifted_data, mTck->GetSampleNumber() );
+
+                // prepare the next frame
+                frm.mStartingSampleInclusive = mTck->GetSampleNumber() + 1;
+                frm.mType = mTAPCtrl.GetCurrState();
+
+                shifted_data.mStartSampleIndex = frm.mStartingSampleInclusive;
+
+                mResults->CommitResults();
             }
         }
 
