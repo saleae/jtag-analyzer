@@ -34,7 +34,7 @@ void JtagAnalyzer::AdvanceTck( Frame& frm, JtagShiftedData& shifted_data )
         mTrst->AdvanceToNextEdge();
 
         // close the frame and add it
-        CloseFrame( frm, shifted_data, mTrst->GetSampleNumber() );
+        CloseFrameV2( frm, shifted_data, mTrst->GetSampleNumber() );
 
         // reset the TAP state
         mTAPCtrl.SetState( TestLogicReset );
@@ -76,7 +76,84 @@ void JtagAnalyzer::Setup()
         mTrst = NULL;
 }
 
-void JtagAnalyzer::CloseFrame( Frame& frm, JtagShiftedData& shifted_data, U64 ending_sample_number )
+std::vector<U8> BitsToBytes( std::vector<U8>& shifted_data )
+{
+    std::vector<U8> byteArray;
+
+    // get the numerical value from the bits
+    std::vector<U8>::const_iterator bsi( shifted_data.begin() );
+
+    U8 val;
+    size_t bits_remaining = shifted_data.size();
+
+    // make an array of 8 bit values
+    // e.g. for 10 bits, byteArray[0] would contain the first 2 bits
+    // and byteArray[1] would contain the next 8 bits.
+    for( ; bsi != shifted_data.end(); )
+    {
+        for( val = 0; bsi != shifted_data.end(); )
+        {
+            val = ( val << 1 ) | ( *bsi == BIT_HIGH ? 1 : 0 );
+            
+            --bits_remaining;
+            ++bsi;
+
+            if ((bits_remaining % 8) == 0)
+            {
+                // We've reached a byte boundary
+                break;
+            }
+        }
+
+        byteArray.emplace_back( val );
+    }
+
+    return byteArray;
+}
+
+void JtagAnalyzer::CloseFrameV2( Frame& frm, JtagShiftedData& shifted_data, U64 ending_sample_number )
+{
+    JtagShiftedData corrected_shifted_data;
+
+    CloseFrame( frm, shifted_data, ending_sample_number, &corrected_shifted_data );
+
+    FrameV2 frame_v2;
+
+    size_t max_bit_count = 0;
+
+    if( corrected_shifted_data.mTdiBits.size() > 0 )
+    {
+        std::vector<U8> data = BitsToBytes( corrected_shifted_data.mTdiBits );
+
+        frame_v2.AddByteArray( "TDI", &data[ 0 ], data.size() );
+
+        if (max_bit_count < corrected_shifted_data.mTdiBits.size() )
+        {
+            max_bit_count = corrected_shifted_data.mTdiBits.size();
+        }
+    }
+
+    if( corrected_shifted_data.mTdoBits.size() > 0 )
+    {
+        std::vector<U8> data = BitsToBytes( corrected_shifted_data.mTdoBits );
+
+        frame_v2.AddByteArray( "TDO", &data[ 0 ], data.size() );
+
+        if( max_bit_count < corrected_shifted_data.mTdoBits.size() )
+        {
+            max_bit_count = corrected_shifted_data.mTdoBits.size();
+        }
+    }
+
+    frame_v2.AddInteger( "BitCount", max_bit_count );
+
+    const char* type = JtagAnalyzerResults::GetStateDescShort( mTAPCtrl.GetCurrState() );
+
+    mResults->AddFrameV2( frame_v2, type,
+        frm.mStartingSampleInclusive, frm.mEndingSampleInclusive );
+}
+
+void JtagAnalyzer::CloseFrame( Frame& frm, JtagShiftedData& shifted_data, U64 ending_sample_number, JtagShiftedData* corrected_shifted_data )
 {
     // save the TDI/TDO values in the frame
     if( frm.mType == ShiftIR || frm.mType == ShiftDR )
@@ -90,6 +167,12 @@ void JtagAnalyzer::CloseFrame( Frame& frm, JtagShiftedData& shifted_data, U64 en
         }
 
         mResults->AddShiftedData( shifted_data );
+
+        if (corrected_shifted_data != NULL)
+        {
+            corrected_shifted_data->mTdiBits = shifted_data.mTdiBits;
+            corrected_shifted_data->mTdoBits = shifted_data.mTdoBits;
+        }
 
         shifted_data.mTdiBits.clear();
         shifted_data.mTdoBits.clear();
@@ -169,7 +252,7 @@ void JtagAnalyzer::WorkerThread()
             if( ( mSettings.mShiftDRBitsPerDataUnit != 0 ) && ( bitCount >= mSettings.mShiftDRBitsPerDataUnit ) )
             {
                 alreadyClosedFrame = true;
-                CloseFrame( frm, shifted_data, mTck->GetSampleNumber() );
+                CloseFrameV2( frm, shifted_data, mTck->GetSampleNumber() );
 
                 // prepare the next frame
                 frm.mStartingSampleInclusive = mTck->GetSampleNumber() + 1;
@@ -186,7 +269,7 @@ void JtagAnalyzer::WorkerThread()
         {
             mResults->AddMarker( mTms->GetSampleNumber(), AnalyzerResults::Dot, mSettings.mTmsChannel );
 
-            CloseFrame( frm, shifted_data, mTck->GetSampleNumber() );
+            CloseFrameV2( frm, shifted_data, mTck->GetSampleNumber() );
 
             // prepare the next frame
             frm.mStartingSampleInclusive = mTck->GetSampleNumber() + 1;
