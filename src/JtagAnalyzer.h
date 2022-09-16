@@ -29,7 +29,8 @@ class JtagAnalyzer : public Analyzer2
     void AdvanceTck( Frame& frm, JtagShiftedData& shifted_data );
 
     // closes the frame, and handles the tdi/tdo data
-    void CloseFrame( Frame& frm, JtagShiftedData& shifted_data, U64 ending_sample_number );
+    void CloseFrame( Frame& frm, JtagShiftedData& shifted_data, U64 ending_sample_number, JtagShiftedData* corrected_shifted_data = NULL );
+    void CloseFrameV2( Frame& frm, JtagShiftedData& shifted_data, U64 ending_sample_number );
 
   protected: // vars
     JtagAnalyzerSettings mSettings;

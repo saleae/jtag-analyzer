@@ -13,7 +13,8 @@ JtagAnalyzerSettings::JtagAnalyzerSettings()
       mTAPInitialState( RunTestIdle ),
       mInstructRegBitOrder( LSB_First ),
       mDataRegBitOrder( LSB_First ),
-      mShowBitCount( false )
+      mShowBitCount( false ),
+      mShiftDRBitsPerDataUnit( 0 )
 {
     // init the interfaces
     mTmsChannelInterface.SetTitleAndTooltip( "TMS", "JTAG Test mode select" );
@@ -54,6 +55,11 @@ JtagAnalyzerSettings::JtagAnalyzerSettings()
     mDataRegBitOrderInterface.AddNumber( LSB_First, "Least significant bit first", "Data register shift LEAST significant bit first" );
     mDataRegBitOrderInterface.SetNumber( mDataRegBitOrder );
 
+    mShiftDRDataUnitInterface.SetTitleAndTooltip( "Shift-DR data unit", "Number of bits to report as a single data unit. 0 to only report when TAP state changes." );
+    mShiftDRDataUnitInterface.SetInteger( mShiftDRBitsPerDataUnit );
+    mShiftDRDataUnitInterface.SetMin( 0 );
+    mShiftDRDataUnitInterface.SetMax( 65536 );
+
     mShowBitCountInterface.SetTitleAndTooltip( "", "Used to count bits sent during Shift state" );
     mShowBitCountInterface.SetCheckBoxText( "Show TDI/TDO bit counts" );
     mShowBitCountInterface.SetValue( mShowBitCount );
@@ -68,6 +74,7 @@ JtagAnalyzerSettings::JtagAnalyzerSettings()
     AddInterface( &mTAPInitialStateInterface );
     AddInterface( &mInstructRegBitOrderInterface );
     AddInterface( &mDataRegBitOrderInterface );
+    AddInterface( &mShiftDRDataUnitInterface );
 
     AddInterface( &mShowBitCountInterface );
 
@@ -133,6 +140,8 @@ bool JtagAnalyzerSettings::SetSettingsFromInterfaces()
     cast2Int = int( mDataRegBitOrderInterface.GetNumber() );
     mDataRegBitOrder = BitOrder( cast2Int );
 
+    mShiftDRBitsPerDataUnit = mShiftDRDataUnitInterface.GetInteger();
+
     mShowBitCount = mShowBitCountInterface.GetValue();
 
     return true;
@@ -149,6 +158,7 @@ void JtagAnalyzerSettings::UpdateInterfacesFromSettings()
     mTAPInitialStateInterface.SetNumber( mTAPInitialState );
     mInstructRegBitOrderInterface.SetNumber( mInstructRegBitOrder );
     mDataRegBitOrderInterface.SetNumber( mDataRegBitOrder );
+    mShiftDRDataUnitInterface.SetInteger( mShiftDRBitsPerDataUnit );
     mShowBitCountInterface.SetValue( mShowBitCount );
 }
 
@@ -176,6 +186,10 @@ void JtagAnalyzerSettings::LoadSettings( const char* settings )
     if( ival == MSB_First || ival == LSB_First )
         mDataRegBitOrder = BitOrder( ival );
 
+    text_archive >> ival;
+    if( ( ival >= 0 ) && ( ival <= 65536 ) )
+        mShiftDRBitsPerDataUnit = ival;
+
     text_archive >> mShowBitCount; // added after 1.2.3. Defaults false on failure to load.
 
 
@@ -202,6 +216,7 @@ const char* JtagAnalyzerSettings::SaveSettings()
     text_archive << int( mTAPInitialState );
     text_archive << int( mInstructRegBitOrder );
     text_archive << int( mDataRegBitOrder );
+    text_archive << mShiftDRBitsPerDataUnit;
 
     text_archive << mShowBitCount; // added after 1.2.3
 
