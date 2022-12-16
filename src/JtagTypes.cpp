@@ -152,13 +152,13 @@ std::string JtagShiftedData::GetStringFromBitStates( const std::vector<U8>& bits
     if( format == TdiTdoStringFormat::Ellipsis64 && bits.size() > 64 )
     {
         std::vector<U8> subset( bits.end() - 64, bits.end() );
-        return GetStringFromBitStates( subset, display_base, format ) + "...";
+        return "..." + GetStringFromBitStates( subset, display_base, format );
     }
 
     if( format == TdiTdoStringFormat::Ellipsis256 && bits.size() > 256 )
     {
         std::vector<U8> subset( bits.end() - 256, bits.end() );
-        return GetStringFromBitStates( subset, display_base, format ) + "...";
+        return "..." + GetStringFromBitStates( subset, display_base, format );
     }
 
     if( ( format == TdiTdoStringFormat::Break64 && bits.size() > 64 ) || ( format == TdiTdoStringFormat::Break256 && bits.size() > 256 ) )
