@@ -7,6 +7,7 @@
 
 JtagAnalyzer::JtagAnalyzer() : mSimulationInitilized( false )
 {
+    UseFrameV2();
     SetAnalyzerSettings( &mSettings );
 }
 
@@ -94,11 +95,11 @@ std::vector<U8> BitsToBytes( std::vector<U8>& shifted_data )
         for( val = 0; bsi != shifted_data.end(); )
         {
             val = ( val << 1 ) | ( *bsi == BIT_HIGH ? 1 : 0 );
-            
+
             --bits_remaining;
             ++bsi;
 
-            if ((bits_remaining % 8) == 0)
+            if( ( bits_remaining % 8 ) == 0 )
             {
                 // We've reached a byte boundary
                 break;
@@ -127,7 +128,7 @@ void JtagAnalyzer::CloseFrameV2( Frame& frm, JtagShiftedData& shifted_data, U64 
 
         frame_v2.AddByteArray( "TDI", &data[ 0 ], data.size() );
 
-        if (max_bit_count < corrected_shifted_data.mTdiBits.size() )
+        if( max_bit_count < corrected_shifted_data.mTdiBits.size() )
         {
             max_bit_count = corrected_shifted_data.mTdiBits.size();
         }
@@ -149,11 +150,11 @@ void JtagAnalyzer::CloseFrameV2( Frame& frm, JtagShiftedData& shifted_data, U64 
 
     const char* type = JtagAnalyzerResults::GetStateDescShort( mTAPCtrl.GetCurrState() );
 
-    mResults->AddFrameV2( frame_v2, type,
-        frm.mStartingSampleInclusive, frm.mEndingSampleInclusive );
+    mResults->AddFrameV2( frame_v2, type, frm.mStartingSampleInclusive, frm.mEndingSampleInclusive );
 }
 
-void JtagAnalyzer::CloseFrame( Frame& frm, JtagShiftedData& shifted_data, U64 ending_sample_number, JtagShiftedData* corrected_shifted_data )
+void JtagAnalyzer::CloseFrame( Frame& frm, JtagShiftedData& shifted_data, U64 ending_sample_number,
+                               JtagShiftedData* corrected_shifted_data )
 {
     // save the TDI/TDO values in the frame
     if( frm.mType == ShiftIR || frm.mType == ShiftDR )
@@ -168,7 +169,7 @@ void JtagAnalyzer::CloseFrame( Frame& frm, JtagShiftedData& shifted_data, U64 en
 
         mResults->AddShiftedData( shifted_data );
 
-        if (corrected_shifted_data != NULL)
+        if( corrected_shifted_data != NULL )
         {
             corrected_shifted_data->mTdiBits = shifted_data.mTdiBits;
             corrected_shifted_data->mTdoBits = shifted_data.mTdoBits;
