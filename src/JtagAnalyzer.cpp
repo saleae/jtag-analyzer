@@ -214,8 +214,6 @@ void JtagAnalyzer::WorkerThread()
 
     for( ;; )
     {
-        bool alreadyClosedFrame = false;
-
         // advance TCK to the rising edge
         AdvanceTck( frm, shifted_data );
         if( mTck->GetBitState() == BIT_LOW )
@@ -252,7 +250,6 @@ void JtagAnalyzer::WorkerThread()
 
             if( ( mSettings.mShiftDRBitsPerDataUnit != 0 ) && ( bitCount >= mSettings.mShiftDRBitsPerDataUnit ) )
             {
-                alreadyClosedFrame = true;
                 CloseFrameV2( frm, shifted_data, mTck->GetSampleNumber() );
 
                 // prepare the next frame
