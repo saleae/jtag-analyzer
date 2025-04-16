@@ -37,6 +37,8 @@ class JtagAnalyzerSettings : public AnalyzerSettings
 
     bool mShowBitCount;
 
+    U32 mShiftDRBitsPerDataUnit;
+
   protected:
     AnalyzerSettingInterfaceChannel mTmsChannelInterface;
     AnalyzerSettingInterfaceChannel mTckChannelInterface;
@@ -48,6 +50,7 @@ class JtagAnalyzerSettings : public AnalyzerSettings
 
     AnalyzerSettingInterfaceNumberList mInstructRegBitOrderInterface;
     AnalyzerSettingInterfaceNumberList mDataRegBitOrderInterface;
+    AnalyzerSettingInterfaceInteger mShiftDRDataUnitInterface;
 
     AnalyzerSettingInterfaceBool mShowBitCountInterface;
 };
