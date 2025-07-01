@@ -55,7 +55,8 @@ JtagAnalyzerSettings::JtagAnalyzerSettings()
     mDataRegBitOrderInterface.AddNumber( LSB_First, "Least significant bit first", "Data register shift LEAST significant bit first" );
     mDataRegBitOrderInterface.SetNumber( mDataRegBitOrder );
 
-    mShiftDRDataUnitInterface.SetTitleAndTooltip( "Shift-DR data unit", "Number of bits to report as a single data unit. 0 to only report when TAP state changes." );
+    mShiftDRDataUnitInterface.SetTitleAndTooltip(
+        "Shift-DR data unit", "Number of bits to report as a single data unit. 0 to only report when TAP state changes." );
     mShiftDRDataUnitInterface.SetInteger( mShiftDRBitsPerDataUnit );
     mShiftDRDataUnitInterface.SetMin( 0 );
     mShiftDRDataUnitInterface.SetMax( 65536 );
